@@ -12,6 +12,7 @@ export default class Homework_exam extends LightningElement {
     subjectType = 'Math';
     questionType = 'Practice';
     grade = '3';
+    answer = {};
 
     connectedCallback() {
         getData({subjectType:this.subjectType, questionType:this.questionType, grade:this.grade})
@@ -21,5 +22,12 @@ export default class Homework_exam extends LightningElement {
         .catch(error => {
             console.log('Cannot getData due to: ', error);
         });
+    }
+
+    handleQuizChoice(event) {
+        let choice = event.target.value;
+        let questionId = event.target.name;
+        this.answer[questionId] = choice;
+        console.log(this.answer);
     }
 }

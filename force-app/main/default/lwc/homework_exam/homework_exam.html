@@ -7,42 +7,48 @@
                 <template for:each={questions} for:item="question">
                     <fieldset class="slds-form-element" key={question.Id}>
                         <template if:true={question.IsQuiz}>
-                            <lightning-formatted-rich-text class="slds-form-element__legend slds-form-element__label slds-m-top_x-small" value={question.Question}></lightning-formatted-rich-text>
+                            <div class="slds-form-element__legend slds-form-element__label slds-m-top_x-small">
+                                <span class="slds-col slds-col-size-1-of-12">{question.Index}.&nbsp;</span>
+                                <lightning-formatted-rich-text  value={question.Question} style="display: inline-block;"></lightning-formatted-rich-text>
+                            </div>
                             <div class="slds-form-element__control">
                                 <span class="slds-radio">
-                                    <input type="radio" id={question.A.Id} value={question.A.Id} name={question.Id}/>
+                                    <input type="radio" id={question.A.Id} value="A" name={question.Id} onchange={handleQuizChoice}/>
                                     <label class="slds-radio__label" for={question.A.Id}>
                                         <span class="slds-radio_faux"></span>
-                                        <lightning-formatted-rich-text class="slds-form-element__label" value={question.A.Value}></lightning-formatted-rich-text>
+                                        <lightning-formatted-rich-text class="slds-form-element__label" value={question.A.Value} style="display: inline-block;"></lightning-formatted-rich-text>
                                     </label>
                                 </span>
                                 <span class="slds-radio">
-                                    <input type="radio" id={question.B.Id} value={question.B.Id} name={question.Id}/>
+                                    <input type="radio" id={question.B.Id} value="B" name={question.Id} onchange={handleQuizChoice}/>
                                     <label class="slds-radio__label" for={question.B.Id}>
                                         <span class="slds-radio_faux"></span>
-                                        <lightning-formatted-rich-text class="slds-form-element__label" value={question.B.Value}></lightning-formatted-rich-text>
+                                        <lightning-formatted-rich-text class="slds-form-element__label" value={question.B.Value} style="display: inline-block;"></lightning-formatted-rich-text>
                                     </label>
                                 </span>
                                 <span class="slds-radio">
-                                    <input type="radio" id={question.C.Id} value={question.C.Id} name={question.Id}/>
+                                    <input type="radio" id={question.C.Id} value="C" name={question.Id} onchange={handleQuizChoice}/>
                                     <label class="slds-radio__label" for={question.C.Id}>
                                         <span class="slds-radio_faux"></span>
-                                        <lightning-formatted-rich-text class="slds-form-element__label" value={question.C.Value}></lightning-formatted-rich-text>
+                                        <lightning-formatted-rich-text class="slds-form-element__label" value={question.C.Value} style="display: inline-block;"></lightning-formatted-rich-text>
                                     </label>
                                 </span>
                                 <span class="slds-radio">
-                                    <input type="radio" id={question.D.Id} value={question.D.Id} name={question.Id}/>
+                                    <input type="radio" id={question.D.Id} value="D" name={question.Id} onchange={handleQuizChoice}/>
                                     <label class="slds-radio__label" for={question.D.Id}>
                                         <span class="slds-radio_faux"></span>
-                                        <lightning-formatted-rich-text class="slds-form-element__label" value={question.D.Value}></lightning-formatted-rich-text>
+                                        <lightning-formatted-rich-text class="slds-form-element__label" value={question.D.Value} style="display: inline-block;"></lightning-formatted-rich-text>
                                     </label>
                                 </span>
                             </div>
                         </template>
                         <template if:false={question.IsQuiz}>
-                            <lightning-formatted-rich-text class="slds-form-element__legend slds-form-element__label slds-m-top_x-small" value={question.Question}></lightning-formatted-rich-text>
+                            <div class="slds-form-element__legend slds-form-element__label slds-m-top_x-small">
+                                <span class="slds-col slds-col-size-1-of-12">{question.Index}.&nbsp;</span>
+                                <lightning-formatted-rich-text  value={question.Question} style="display: inline-block;"></lightning-formatted-rich-text>
+                            </div>
                             <div class="slds-form-element__control">
-                                <lightning-textarea variant="label-hidden" style="--sds-c-textarea-sizing-min-height: 150px;" value={question.Answer}></lightning-textarea>
+                                <lightning-textarea variant="label-hidden" style="--sds-c-textarea-sizing-min-height: 150px;" value="" onchange={handleWrittingAnswer}></lightning-textarea>
                             </div>
                         </template>
                     </fieldset>

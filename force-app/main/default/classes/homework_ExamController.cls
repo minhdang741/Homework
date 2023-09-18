@@ -20,7 +20,8 @@ public with sharing class homework_ExamController {
     }
 
     public class QuestionWrapper {
-        @AuraEnabled public Integer Id {get; set;}
+        @AuraEnabled public String Id {get; set;}
+        @AuraEnabled public Integer Index {get; set;}
         @AuraEnabled public Boolean IsQuiz {get; set;}
         @AuraEnabled public String Question {get; set;}
         @AuraEnabled public ChoiceWrapper A {get; set;}
@@ -31,24 +32,25 @@ public with sharing class homework_ExamController {
         
         // Format question
         public QuestionWrapper(Integer index, Question__c question) {
-            this.Id = index;
+            this.Id = question.Id;
+            this.Index = index;
             this.IsQuiz = String.isBlank(question.A__c) ? false : true;
             this.Question = question.Question__c;
-            this.A = new ChoiceWrapper(index, question.A__c, 'A');
-            this.B = new ChoiceWrapper(index, question.B__c, 'B');
-            this.C = new ChoiceWrapper(index, question.C__c, 'C');
-            this.D = new ChoiceWrapper(index, question.D__c, 'D');
+            this.A = new ChoiceWrapper(Id, question.A__c, 'A');
+            this.B = new ChoiceWrapper(Id, question.B__c, 'B');
+            this.C = new ChoiceWrapper(Id, question.C__c, 'C');
+            this.D = new ChoiceWrapper(Id, question.D__c, 'D');
             this.Answer = '';
         }
     }
 
     public class ChoiceWrapper {
-        public String Id {get; set;}
-        public String Value {get; set;}
+        @AuraEnabled public String Id {get; set;}
+        @AuraEnabled public String Value {get; set;}
 
         // Format choice
-        public ChoiceWrapper(Integer index, String value, String choice) {
-            this.Id = String.format('{0}.{1}', new List<String>{String.valueOf(index), choice});
+        public ChoiceWrapper(String questionId, String value, String choice) {
+            this.Id = String.format('{0}.{1}', new List<String>{questionId, choice});
             this.Value = value;
         }
     }
