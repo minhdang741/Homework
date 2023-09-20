@@ -19,39 +19,68 @@ public with sharing class homework_ExamController {
         return listQuestionWrapper;
     }
 
+    @AuraEnabled
+    public static Student__c login(String username, String password) {
+        Student__c student = [SELECT Id, Grade__c FROM Student__c WHERE Name = :username AND Password__c = :password LIMIT 1];
+        return student;
+    }
+    @AuraEnabled
+    public static List<SubjectWrapper> getAllSubject() {
+        List<Subject__c> allSubjects = [SELECT Id, Type__c FROM Subject__c ORDER BY Type__c ASC];
+        List<SubjectWrapper> listSubjectWrapper = new List<SubjectWrapper>();
+        for(Subject__c subject : allSubjects) {
+            SubjectWrapper subjectWrap = new SubjectWrapper(listSubjectWrapper.size(), subject);
+            listSubjectWrapper.add(subjectWrap);
+        }
+        return listSubjectWrapper;
+    }
+
+    public class SubjectWrapper {
+        @AuraEnabled public Integer id {get; set;}
+        @AuraEnabled public String value {get; set;}
+        @AuraEnabled public String label {get; set;}
+
+        // Format subject
+        public SubjectWrapper(Integer index, Subject__c subject) {
+            this.id = index;
+            this.value = subject.Type__c;
+            this.label = subject.Type__c;
+        }
+    }
+
     public class QuestionWrapper {
-        @AuraEnabled public String Id {get; set;}
-        @AuraEnabled public Integer Index {get; set;}
-        @AuraEnabled public Boolean IsQuiz {get; set;}
-        @AuraEnabled public String Question {get; set;}
+        @AuraEnabled public String id {get; set;}
+        @AuraEnabled public Integer index {get; set;}
+        @AuraEnabled public Boolean isQuiz {get; set;}
+        @AuraEnabled public String question {get; set;}
         @AuraEnabled public ChoiceWrapper A {get; set;}
         @AuraEnabled public ChoiceWrapper B {get; set;}
         @AuraEnabled public ChoiceWrapper C {get; set;}
         @AuraEnabled public ChoiceWrapper D {get; set;}
-        @AuraEnabled public String Answer {get; set;}
+        @AuraEnabled public String answer {get; set;}
         
         // Format question
         public QuestionWrapper(Integer index, Question__c question) {
-            this.Id = question.Id;
-            this.Index = index;
-            this.IsQuiz = String.isBlank(question.A__c) ? false : true;
-            this.Question = question.Question__c;
-            this.A = new ChoiceWrapper(Id, question.A__c, 'A');
-            this.B = new ChoiceWrapper(Id, question.B__c, 'B');
-            this.C = new ChoiceWrapper(Id, question.C__c, 'C');
-            this.D = new ChoiceWrapper(Id, question.D__c, 'D');
-            this.Answer = '';
+            this.id = question.Id;
+            this.index = index;
+            this.isQuiz = String.isBlank(question.A__c) ? false : true;
+            this.question = question.Question__c;
+            this.A = new ChoiceWrapper(id, question.A__c, 'A');
+            this.B = new ChoiceWrapper(id, question.B__c, 'B');
+            this.C = new ChoiceWrapper(id, question.C__c, 'C');
+            this.D = new ChoiceWrapper(id, question.D__c, 'D');
+            this.answer = '';
         }
     }
 
     public class ChoiceWrapper {
-        @AuraEnabled public String Id {get; set;}
-        @AuraEnabled public String Value {get; set;}
+        @AuraEnabled public String id {get; set;}
+        @AuraEnabled public String value {get; set;}
 
         // Format choice
         public ChoiceWrapper(String questionId, String value, String choice) {
-            this.Id = String.format('{0}.{1}', new List<String>{questionId, choice});
-            this.Value = value;
+            this.id = String.format('{0}.{1}', new List<String>{questionId, choice});
+            this.value = value;
         }
     }
 }

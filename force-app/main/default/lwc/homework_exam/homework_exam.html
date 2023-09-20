@@ -1,71 +1,113 @@
 <!-- sldsValidatorIgnore -->
 <template>
     <div style="background-color: white;">
-        <div class="slds-m-left_small slds-m-right_small" >
-            <!-- Section Questions -->
-            <section class="slds-m-bottom_small">
-                <template for:each={questions} for:item="question">
-                    <fieldset class="slds-form-element" key={question.Id}>
-                        <template if:true={question.IsQuiz}>
-                            <div class="slds-form-element__legend slds-form-element__label slds-m-top_x-small">
-                                <span class="slds-col slds-col-size-1-of-12">{question.Index}.&nbsp;</span>
-                                <lightning-formatted-rich-text  value={question.Question} style="display: inline-block;"></lightning-formatted-rich-text>
-                            </div>
-                            <div class="slds-form-element__control">
-                                <span class="slds-radio">
-                                    <input type="radio" id={question.A.Id} value="A" name={question.Id} onchange={handleQuizChoice}/>
-                                    <label class="slds-radio__label" for={question.A.Id}>
-                                        <span class="slds-radio_faux"></span>
-                                        <lightning-formatted-rich-text class="slds-form-element__label" value={question.A.Value} style="display: inline-block;"></lightning-formatted-rich-text>
-                                    </label>
-                                </span>
-                                <span class="slds-radio">
-                                    <input type="radio" id={question.B.Id} value="B" name={question.Id} onchange={handleQuizChoice}/>
-                                    <label class="slds-radio__label" for={question.B.Id}>
-                                        <span class="slds-radio_faux"></span>
-                                        <lightning-formatted-rich-text class="slds-form-element__label" value={question.B.Value} style="display: inline-block;"></lightning-formatted-rich-text>
-                                    </label>
-                                </span>
-                                <span class="slds-radio">
-                                    <input type="radio" id={question.C.Id} value="C" name={question.Id} onchange={handleQuizChoice}/>
-                                    <label class="slds-radio__label" for={question.C.Id}>
-                                        <span class="slds-radio_faux"></span>
-                                        <lightning-formatted-rich-text class="slds-form-element__label" value={question.C.Value} style="display: inline-block;"></lightning-formatted-rich-text>
-                                    </label>
-                                </span>
-                                <span class="slds-radio">
-                                    <input type="radio" id={question.D.Id} value="D" name={question.Id} onchange={handleQuizChoice}/>
-                                    <label class="slds-radio__label" for={question.D.Id}>
-                                        <span class="slds-radio_faux"></span>
-                                        <lightning-formatted-rich-text class="slds-form-element__label" value={question.D.Value} style="display: inline-block;"></lightning-formatted-rich-text>
-                                    </label>
-                                </span>
-                            </div>
-                        </template>
-                        <template if:false={question.IsQuiz}>
-                            <div class="slds-form-element__legend slds-form-element__label slds-m-top_x-small">
-                                <span class="slds-col slds-col-size-1-of-12">{question.Index}.&nbsp;</span>
-                                <lightning-formatted-rich-text  value={question.Question} style="display: inline-block;"></lightning-formatted-rich-text>
-                            </div>
-                            <div class="slds-form-element__control">
-                                <lightning-textarea variant="label-hidden" style="--sds-c-textarea-sizing-min-height: 150px;" value="" onchange={handleWrittingAnswer}></lightning-textarea>
-                            </div>
-                        </template>
-                    </fieldset>
-                </template>
-            </section>
-            <!-- Section Footer -->
-            <section class="slds-grid slds-gutters slds-p-top_small slds-p-bottom_small slds-border_top">
-                <div class="slds-col slds-size_1-of-3 slds-text-align_left">
-                    <button class="slds-button slds-button_destructive">Cancel</button>
+        <!-- Section Login -->
+        <section if:false={isLogin} class="slds-m-left_small slds-m-right_small slds-text-align_center">
+            <fieldset class="slds-form-element">
+                <div class="slds-form-element__control">
+                    <span class="slds-form-element__label" style="min-width: 70px;">Username:</span>
+                    <div style="display: inline-block;">
+                        <input class="slds-input" type="text" name="username"/>
+                    </div>
                 </div>
-                <div class="slds-col slds-size_1-of-3 slds-text-align_center">
-                    <button class="slds-button slds-button_neutral" style="background-color: #D4AF37; color:white">Take Another Exam</button>
+                <div class="slds-form-element__control slds-m-top_small">
+                    <span class="slds-form-element__label" style="min-width: 70px;">Password:</span>
+                    <div style="display: inline-block;">
+                        <input class="slds-input" type="password" name="password"/>
+                    </div>
                 </div>
-                <div class="slds-col slds-size_1-of-3 slds-text-align_right">
-                    <button class="slds-button slds-button_brand">Submit</button>
+                <div class="slds-form-element__control slds-m-top_small">
+                    <span class="slds-form-element__label" style="min-width: 70px;">Subject:</span>
+                    <div style="display: inline-block;">
+                        <select name="subject" onchange={selectSubject} class="slds-input" style="min-width: 206px;">
+                            <template for:each={subjects} for:item="sub">
+                                <option key={sub.Id} value={sub.value}>{sub.label}</option>
+                            </template>
+                        </select>
+                    </div>
                 </div>
-            </section>
-        </div>
+                <div class="slds-form-element__control slds-m-top_small">
+                    <span class="slds-form-element__label" style="min-width: 70px;">Exam type:</span>
+                    <div style="display: inline-block;">
+                        <select name="examType" onchange={selectExamType} class="slds-input" style="min-width: 206px;">
+                            <template for:each={examTypes} for:item="type">
+                                <option key={type.Id} value={type.value}>{type.label}</option>
+                            </template>
+                        </select>
+                    </div>
+                </div>
+                <div class="slds-form-element__control slds-m-top_small">
+                    <lightning-button variant="brand" onclick={handleLogin} label="Take Exam"></lightning-button>
+                </div>
+            </fieldset>
+        </section>
+
+        <!-- Section Exam -->
+        <section if:true={isLogin} class="slds-m-left_small slds-m-right_small slds-m-bottom_small">
+            <template for:each={questions} for:item="question">
+                <fieldset class="slds-form-element" key={question.id}>
+                    <!-- Quiz Questions -->
+                    <template if:true={question.isQuiz}>
+                        <div class="slds-form-element__legend slds-form-element__label slds-m-top_x-small">
+                            <span>{question.index}.&nbsp;</span>
+                            <lightning-formatted-rich-text  value={question.question} style="display: inline-block;"></lightning-formatted-rich-text>
+                        </div>
+                        <div class="slds-form-element__control">
+                            <span class="slds-radio">
+                                <input type="radio" id={question.A.id} value="A" name={question.id} onchange={handleQuizChoice}/>
+                                <label class="slds-radio__label" for={question.A.id}>
+                                    <span class="slds-radio_faux"></span>
+                                    <lightning-formatted-rich-text class="slds-form-element__label" value={question.A.value} style="display: inline-block;"></lightning-formatted-rich-text>
+                                </label>
+                            </span>
+                            <span class="slds-radio">
+                                <input type="radio" id={question.B.id} value="B" name={question.id} onchange={handleQuizChoice}/>
+                                <label class="slds-radio__label" for={question.B.id}>
+                                    <span class="slds-radio_faux"></span>
+                                    <lightning-formatted-rich-text class="slds-form-element__label" value={question.B.value} style="display: inline-block;"></lightning-formatted-rich-text>
+                                </label>
+                            </span>
+                            <span class="slds-radio">
+                                <input type="radio" id={question.C.id} value="C" name={question.id} onchange={handleQuizChoice}/>
+                                <label class="slds-radio__label" for={question.C.id}>
+                                    <span class="slds-radio_faux"></span>
+                                    <lightning-formatted-rich-text class="slds-form-element__label" value={question.C.value} style="display: inline-block;"></lightning-formatted-rich-text>
+                                </label>
+                            </span>
+                            <span class="slds-radio">
+                                <input type="radio" id={question.D.id} value="D" name={question.id} onchange={handleQuizChoice}/>
+                                <label class="slds-radio__label" for={question.D.id}>
+                                    <span class="slds-radio_faux"></span>
+                                    <lightning-formatted-rich-text class="slds-form-element__label" value={question.D.value} style="display: inline-block;"></lightning-formatted-rich-text>
+                                </label>
+                            </span>
+                        </div>
+                    </template>
+                    <!-- Writting Questions -->
+                    <template if:false={question.isQuiz}>
+                        <div class="slds-form-element__legend slds-form-element__label slds-m-top_x-small">
+                            <span>{question.index}.&nbsp;</span>
+                            <lightning-formatted-rich-text  value={question.question} style="display: inline-block;"></lightning-formatted-rich-text>
+                        </div>
+                        <div class="slds-form-element__control">
+                            <lightning-textarea variant="label-hidden" style="--sds-c-textarea-sizing-min-height: 150px;" value="" onchange={handleWrittingAnswer}></lightning-textarea>
+                        </div>
+                    </template>
+                </fieldset>
+            </template>
+        </section>
+
+        <!-- Section Footer -->
+        <section if:true={isLogin} class="slds-grid slds-gutters slds-p-top_small slds-p-bottom_small slds-border_top slds-m-left_small slds-m-right_small">
+            <div class="slds-col slds-size_1-of-3 slds-text-align_left">
+                <button class="slds-button slds-button_destructive">Cancel</button>
+            </div>
+            <div class="slds-col slds-size_1-of-3 slds-text-align_center">
+                <button class="slds-button slds-button_neutral" style="background-color: #D4AF37; color:white">Take Another Exam</button>
+            </div>
+            <div class="slds-col slds-size_1-of-3 slds-text-align_right">
+                <button class="slds-button slds-button_brand">Submit</button>
+            </div>
+        </section>
     </div>
 </template>
