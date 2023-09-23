@@ -1,6 +1,17 @@
 <!-- sldsValidatorIgnore -->
 <template>
-    <div style="background-color: white;">
+    <div style="background-color: white;position:relative">
+        <!-- Spinner -->
+        <div if:true={isLoading} class="demo-only demo--inverse" style="height:6rem;position:relative">
+            <div class="slds-spinner_container" style="position: fixed;">
+                <div role="status" class="slds-spinner slds-spinner_medium">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+
         <!-- Section Login -->
         <section if:false={isLogin} class="slds-m-left_small slds-m-right_small slds-text-align_center">
             <fieldset class="slds-form-element">
@@ -54,28 +65,28 @@
                         </div>
                         <div class="slds-form-element__control">
                             <span class="slds-radio">
-                                <input type="radio" id={question.A.id} value="A" name={question.id} onchange={handleQuizChoice}/>
+                                <input type="radio" id={question.A.id} value="A" name={question.id} onchange={handleQuizChoice} disabled={isSubmit}/>
                                 <label class="slds-radio__label" for={question.A.id}>
                                     <span class="slds-radio_faux"></span>
                                     <lightning-formatted-rich-text class="slds-form-element__label" value={question.A.value} style="display: inline-block;"></lightning-formatted-rich-text>
                                 </label>
                             </span>
                             <span class="slds-radio">
-                                <input type="radio" id={question.B.id} value="B" name={question.id} onchange={handleQuizChoice}/>
+                                <input type="radio" id={question.B.id} value="B" name={question.id} onchange={handleQuizChoice} disabled={isSubmit}/>
                                 <label class="slds-radio__label" for={question.B.id}>
                                     <span class="slds-radio_faux"></span>
                                     <lightning-formatted-rich-text class="slds-form-element__label" value={question.B.value} style="display: inline-block;"></lightning-formatted-rich-text>
                                 </label>
                             </span>
                             <span class="slds-radio">
-                                <input type="radio" id={question.C.id} value="C" name={question.id} onchange={handleQuizChoice}/>
+                                <input type="radio" id={question.C.id} value="C" name={question.id} onchange={handleQuizChoice} disabled={isSubmit}/>
                                 <label class="slds-radio__label" for={question.C.id}>
                                     <span class="slds-radio_faux"></span>
                                     <lightning-formatted-rich-text class="slds-form-element__label" value={question.C.value} style="display: inline-block;"></lightning-formatted-rich-text>
                                 </label>
                             </span>
                             <span class="slds-radio">
-                                <input type="radio" id={question.D.id} value="D" name={question.id} onchange={handleQuizChoice}/>
+                                <input type="radio" id={question.D.id} value="D" name={question.id} onchange={handleQuizChoice} disabled={isSubmit}/>
                                 <label class="slds-radio__label" for={question.D.id}>
                                     <span class="slds-radio_faux"></span>
                                     <lightning-formatted-rich-text class="slds-form-element__label" value={question.D.value} style="display: inline-block;"></lightning-formatted-rich-text>
@@ -90,7 +101,7 @@
                             <lightning-formatted-rich-text  value={question.question} style="display: inline-block;"></lightning-formatted-rich-text>
                         </div>
                         <div class="slds-form-element__control">
-                            <lightning-textarea variant="label-hidden" style="--sds-c-textarea-sizing-min-height: 150px;" value="" onchange={handleWrittingAnswer}></lightning-textarea>
+                            <lightning-textarea variant="label-hidden" style="--sds-c-textarea-sizing-min-height: 150px;" value="" onchange={handleWrittingAnswer} name={question.id} disabled={isSubmit}></lightning-textarea>
                         </div>
                     </template>
                 </fieldset>
@@ -100,13 +111,14 @@
         <!-- Section Footer -->
         <section if:true={isLogin} class="slds-grid slds-gutters slds-p-top_small slds-p-bottom_small slds-border_top slds-m-left_small slds-m-right_small">
             <div class="slds-col slds-size_1-of-3 slds-text-align_left">
-                <button class="slds-button slds-button_destructive">Cancel</button>
+                <button class="slds-button slds-button_destructive" onclick={backToLogin}>Cancel</button>
             </div>
+
             <div class="slds-col slds-size_1-of-3 slds-text-align_center">
                 <button class="slds-button slds-button_neutral" style="background-color: #D4AF37; color:white">Take Another Exam</button>
             </div>
             <div class="slds-col slds-size_1-of-3 slds-text-align_right">
-                <button class="slds-button slds-button_brand">Submit</button>
+                <button class="slds-button slds-button_brand" onclick={handleSubmit} disabled={isSubmit}>Submit</button>
             </div>
         </section>
     </div>

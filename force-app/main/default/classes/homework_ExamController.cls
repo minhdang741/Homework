@@ -12,7 +12,7 @@ public with sharing class homework_ExamController {
         // Wrap questions
         List<QuestionWrapper> listQuestionWrapper = new List<QuestionWrapper>();
         for(Question__c question : questions) {
-            QuestionWrapper questionWrap = new QuestionWrapper(listQuestionWrapper.size(), question);
+            QuestionWrapper questionWrap = new QuestionWrapper(listQuestionWrapper.size() + 1, question);
             listQuestionWrapper.add(questionWrap);
         }
         
@@ -33,6 +33,31 @@ public with sharing class homework_ExamController {
             listSubjectWrapper.add(subjectWrap);
         }
         return listSubjectWrapper;
+    }
+
+    @AuraEnabled
+    public static String submit(String answers, String studentId) {
+        Map<String,String> mapAnswers = (Map<String,String>) JSON.deserialize(answers, Map<String,String>.class);
+        System.debug(mapAnswers);
+        Datetime submitDate = Datetime.now();
+        List<Student_Answer__c> listAnswers = new List<Student_Answer__c>();
+        for(String quesId : mapAnswers.keySet()) {
+            Student_Answer__c studentAnswer = new Student_Answer__c();
+            studentAnswer.Student__c = studentId;
+            studentAnswer.Question__c = quesId;
+            studentAnswer.Answer__c = mapAnswers.get(quesId);
+            studentAnswer.Submit_Date__c = submitDate;
+            listAnswers.add(studentAnswer);
+        }
+        Savepoint sp = Database.setSavepoint();
+        try {
+            insert listAnswers;
+            return 'Submit sucessfully';
+        } catch (DmlException e) {
+            Database.rollback(sp);
+            System.debug('Submit error --> ' + e);
+            throw new AuraHandledException(e.getMessage());
+        }
     }
 
     public class SubjectWrapper {

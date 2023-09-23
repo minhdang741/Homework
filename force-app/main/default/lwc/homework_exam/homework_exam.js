@@ -1,26 +1,23 @@
 import { LightningElement, track } from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+// Import controller
 import getData from '@salesforce/apex/homework_ExamController.getData';
 import login from '@salesforce/apex/homework_ExamController.login';
 import getAllSubject from '@salesforce/apex/homework_ExamController.getAllSubject';
+import submit from '@salesforce/apex/homework_ExamController.submit';
 
 export default class Homework_exam extends LightningElement {
-    questions = [
-        // {"Id": "1", "IsQuiz":true, "Question":"This is first question", "A":{"Id":"1.1", "Value":"This is answer"}, "B":{"Id":"1.2", "Value":"This is answer"}, "C":{"Id":"1.3", "Value":"This is answer"}, "D":{"Id":"1.4", "Value":"This is answer"}, "Answer":""},
-        // {"Id": "2", "IsQuiz":true, "Question":"This is second question", "A":{"Id":"2.1", "Value":"This is answer"}, "B":{"Id":"2.2", "Value":"This is answer"}, "C":{"Id":"2.3", "Value":"This is answer"}, "D":{"Id":"2.4", "Value":"This is answer"}, "Answer":""},
-        // {"Id": "3", "IsQuiz":false, "Question":"This is third question", "Answer":""},
-        // {"Id": "2", "Question":"This is second question", "Answer":[{"Id":"a2", "Value":"This is answer"}, {"Id":"b2", "Value":"This is answer"}, {"Id":"c2", "Value":"This is answer"}, {"Id":"d2", "Value":"This is answer"}]},
-        // {"Id": "2", "Question":"This is second question", "a":"This is answer", "b":"his is answer", "c":"his is answer", "d":"his is answer"}
-    ];
+    questions = [];
     answers = {};
     examTypes = [
         {id:"1", label:"Practice", value:"Practice"},
         {id:"2", label:"Exam", value:"Exam"}
     ];
-    subjects = [
-        // {id:"1", label:"Math", value:"Math"},
-        // {id:"2", label:"Literature", value:"Literature"}
-    ];
+    subjects = [];
     isLogin = false;
+    studentInfo = {};
+    isLoading = false;
+    isSubmit = false;
 
     connectedCallback() {
         getAllSubject()
@@ -28,7 +25,7 @@ export default class Homework_exam extends LightningElement {
             this.subjects = result
         })
         .catch(error => {
-            console.log("Cannot get subjects due to: " + error?.message?.body);
+            console.log("Cannot get subjects due to: " + error?.body?.message);
         });
     }
 
@@ -50,6 +47,7 @@ export default class Homework_exam extends LightningElement {
     }
 
     handleLogin() {
+        this.isLoading = true;
         let username = this.template.querySelector('input[name="username"]').value;
         let password = this.template.querySelector('input[name="password"]').value;
         let type = this.template.querySelector('select[name="examType"]').value;
@@ -57,24 +55,59 @@ export default class Homework_exam extends LightningElement {
         // Handle login
         login({username:username, password:password})
         .then(result => {
+            this.isLoading = false;
             // If login successfully
             if(result) {
-                let student = result;
-                this.isLogin = true
-                console.log(student);
+                this.isLoading = true;
+                this.studentInfo = result;
+                this.isLogin = true;
+                console.log(this.studentInfo);
                 // Get exam
-                getData({subjectType:subject, questionType:type, grade:student.Grade__c})
+                getData({subjectType:subject, questionType:type, grade:this.studentInfo.Grade__c})
                 .then(result => {
                     console.log(result);
                     this.questions = result;
+                    // Generate answer
+                    for(let i = 0; i < this.questions.length; i++) {
+                        this.answers[this.questions[i].id] = '';
+                    }
+                    this.isLoading = false;
                 })
                 .catch(error => {
-                    console.log('Cannot getData due to: ', error?.message?.body);
+                    this.isLoading = false;
+                    console.log('Cannot getData due to: ', error?.body?.message);
                 });
             }
         })
         .catch(error => {
-            console.log("cannot login due to: " + error?.message?.body);
+            this.isLoading = false;
+            console.log("cannot login due to: " + error?.body?.message);
         });
+    }
+
+    handleSubmit() {
+        this.isLoading = true;
+        console.log('answers: ' + JSON.stringify(this.answers));
+        submit({answers: JSON.stringify(this.answers), studentId: this.studentInfo.Id})
+        .then(result => {
+            console.log(result);
+            this.isLoading = false;
+            this.isSubmit = true;
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Submit successfully',
+                    message: 'Thanks for taking exam.',
+                    variant: 'success',
+                }),
+            );
+        })
+        .catch(error => {
+            this.isLoading = false;
+            console.log('Cannot submit due to: ' + error?.body?.message);
+        });
+    }
+
+    backToLogin() {
+        this.isLogin = false;
     }
 }
